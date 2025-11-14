@@ -7,7 +7,7 @@ import os
 HF_USERNAME = "Roshanmpraj"
 repo_id = f"{HF_USERNAME}/engine_predictive_maintenance_data" # Use a dynamic ID
 repo_type = "dataset"
-data_folder_path = "/content/Predictive_Maintenance/data" # Use the folder you created in Step 1.1
+data_folder_path = "Predictive_Maintenance/data" # Use the folder you created in Step 1.1
 
 # --- 2. Execution (From Second Option) ---
 # Initialize API client (uses HF_TOKEN environment variable if not specified)
