@@ -1,0 +1,10 @@
+# Core Streamlit
+streamlit
+# Data Manipulation
+pandas
+numpy
+# Machine Learning
+xgboost
+scikit-learn
+# Hugging Face for Model Loading
+huggingface-hub
