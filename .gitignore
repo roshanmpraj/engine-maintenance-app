@@ -1,0 +1,6 @@
+drive/
+.config/
+sample_data/
+mlruns/
+mlflow.db
+__pycache__/

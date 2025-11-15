@@ -1,0 +1,68 @@
+name: Engine Predictive Maintenance CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Workflow triggers on push to the main branch
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  ml_pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        # Install dependencies from all relevant requirements files
+        run: |
+          pip install --upgrade pip
+          pip install pandas scikit-learn xgboost mlflow huggingface-hub
+
+      - name: Configure Hugging Face and MLflow
+        # Set environment variables for authentication and tracking
+        env:
+          HF_USERNAME: Roshanmpraj # Replace with your username
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Setting up environment variables..."
+          # MLflow setup (using a local database in the runner)
+          export MLFLOW_TRACKING_URI="sqlite:///mlruns.db"
+          # Hugging Face login
+          echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" | huggingface-cli login
+
+      - name: Create Data and Scripts Directories
+        run: |
+          mkdir -p Predictive_Maintenance/Data_Prep
+          mkdir -p Predictive_Maintenance/Model_Building
+          # The workflow assumes prep.py and train.py exist in the repo
+
+      - name: Execute Data Preparation
+        # Assuming the prep.py script is configured to download the raw data
+        # from HF and upload the processed X/y train/test files back.
+        run: |
+          python Predictive_Maintenance/Model_Building/prep.py
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+      - name: Execute Model Training and Registration
+        # This step trains the model, logs results to MLflow, and pushes the model artifact to HF Model Hub.
+        run: |
+          python Predictive_Maintenance/Model_Building/train.py
+        env:
+          HF_USERNAME: Roshanmpraj
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+
+      - name: Build and Push Docker Image (Continuous Deployment)
+        # This step would typically build the Docker image and push it to a registry (like Docker Hub or GitHub Packages).
+        # For simplicity in this YAML, we'll note the step, but actual Docker build/push commands are complex and depend on a registry.
+        run: |
+          echo "--- Deployment Step ---"
+          echo "Docker build and push commands would go here to update the Hugging Face Space."
+          echo "Requires a dedicated script/action to push deployment files to the HF Space repository."
